@@ -1,20 +1,54 @@
 // pages/index.tsx
 import { useEffect, useState } from 'react';
-import { Table, Button, Tag, message, Modal } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { Service } from '../utils/services';
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Button,
+  Tag,
+  useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Box,
+  Heading,
+} from '@chakra-ui/react';
+// Removed unused import 'services'
+
+interface Service {
+  id: number;
+  name: string;
+  command: string;
+  port: number;
+  healthUrl: string;
+  autoStart: boolean;
+  startTrigger?: {
+    type: string; // "manual", "scheduled", "onBoot"
+    schedule?: string; // Cron expression
+  };
+  killTrigger?: {
+    type: string; // "manual", "scheduled"
+    schedule?: string; // Cron expression
+  };
+}
 
 interface ServiceStatus extends Service {
   status: string;
   pid: number | null;
 }
 
-// const { Column } = Table;
-
 export default function Home() {
-  const [serviceList, setServiceList] = useState<ServiceStatus[]>(
-    [] // 初始为空，后续通过WebSocket更新
-  );
+  const [serviceList, setServiceList] = useState<ServiceStatus[]>([]);
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [currentService, setCurrentService] = useState<ServiceStatus | null>(null);
 
   useEffect(() => {
     // 建立WebSocket连接
@@ -50,7 +84,6 @@ export default function Home() {
 
   const fetchServices = async () => {
     try {
-      // 由于服务信息在后端，前端需要通过API获取
       const response = await fetch('/api/get-services');
       const data = await response.json();
       if (response.ok) {
@@ -62,10 +95,20 @@ export default function Home() {
           }))
         );
       } else {
-        message.error('无法获取服务信息');
+        toast({
+          title: '无法获取服务信息',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
       }
-    } catch (error) {
-      message.error('网络错误: ' + error);
+    } catch {
+      toast({
+        title: '网络错误',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -78,12 +121,27 @@ export default function Home() {
       });
       const result = await response.json();
       if (response.ok) {
-        message.success(result.message);
+        toast({
+          title: result.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
-        message.error(result.message);
+        toast({
+          title: result.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
       }
-    } catch (error) {
-      message.error('网络错误: ' + error);
+    } catch {
+      toast({
+        title: '网络错误',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -96,12 +154,27 @@ export default function Home() {
       });
       const result = await response.json();
       if (response.ok) {
-        message.success(result.message);
+        toast({
+          title: result.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
-        message.error(result.message);
+        toast({
+          title: result.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
       }
-    } catch (error) {
-      message.error('网络错误: ' + error);
+    } catch {
+      toast({
+        title: '网络错误',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -112,12 +185,27 @@ export default function Home() {
       });
       const result = await response.json();
       if (response.ok) {
-        message.success(result.message);
+        toast({
+          title: result.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
-        message.error(result.message);
+        toast({
+          title: result.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
       }
-    } catch (error) {
-      message.error('网络错误: ' + error);
+    } catch {
+      toast({
+        title: '网络错误',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -128,82 +216,100 @@ export default function Home() {
       });
       const result = await response.json();
       if (response.ok) {
-        message.success(result.message);
+        toast({
+          title: result.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
-        message.error(result.message);
+        toast({
+          title: result.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
       }
-    } catch (error) {
-      message.error('网络错误: ' + error);
+    } catch {
+      toast({
+        title: '网络错误',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
-  const showKillModal = (service: ServiceStatus) => {
-    Modal.confirm({
-      title: `终止服务: ${service.name}`,
-      content: `确定要终止服务 "${service.name}" 吗？`,
-      onOk: () => stopService(service.id),
-    });
+  const handleOpenKillModal = (service: ServiceStatus) => {
+    setCurrentService(service);
+    onOpen();
   };
 
-  const showStartModal = (service: ServiceStatus) => {
-    Modal.confirm({
-      title: `启动服务: ${service.name}`,
-      content: `确定要启动服务 "${service.name}" 吗？`,
-      onOk: () => startService(service.id),
-    });
+  const handleOpenStartModal = (service: ServiceStatus) => {
+    setCurrentService(service);
+    onOpen();
   };
 
-  const columns: ColumnsType<ServiceStatus> = [
+  const handleConfirm = () => {
+    if (currentService) {
+      if (currentService.status === '未启动') {
+        startService(currentService.id);
+      } else {
+        stopService(currentService.id);
+      }
+    }
+    onClose();
+  };
+
+  const columns = [
     {
-      title: '服务ID',
-      dataIndex: 'id',
-      key: 'id',
+      Header: '服务ID',
+      accessor: 'id',
     },
     {
-      title: '服务名称',
-      dataIndex: 'name',
-      key: 'name',
+      Header: '服务名称',
+      accessor: 'name',
     },
     {
-      title: 'PID',
-      dataIndex: 'pid',
-      key: 'pid',
+      Header: 'PID',
+      accessor: 'pid',
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => {
-        let color = 'default';
-        if (status === '运行中') color = 'green';
-        else if (status === '启动中' || status === '端口未监听') color = 'blue';
+      Header: '状态',
+      accessor: 'status',
+      Cell: ({ value }: { value: string }) => {
+        let colorScheme = 'gray';
+        if (value === '运行中') colorScheme = 'green';
+        else if (value === '启动中' || value === '端口未监听') colorScheme = 'blue';
         else if (
-          status.includes('失败') ||
-          status.includes('错误') ||
-          status === '启动超时' ||
-          status === '进程已终止'
+          value.includes('失败') ||
+          value.includes('错误') ||
+          value === '启动超时' ||
+          value === '进程已终止'
         )
-          color = 'red';
-        return <Tag color={color}>{status}</Tag>;
+          colorScheme = 'red';
+        return <Tag colorScheme={colorScheme}>{value}</Tag>;
       },
     },
     {
-      title: '操作',
-      key: 'actions',
-      render: (_, record) => (
+      Header: '操作',
+      accessor: 'actions',
+      Cell: ({ row }: { row: { original: ServiceStatus } }) => (
         <>
           <Button
-            type="primary"
-            onClick={() => showStartModal(record)}
-            disabled={record.status === '运行中' || record.status === '启动中'}
-            style={{ marginRight: '10px' }}
+            colorScheme="blue"
+            size="sm"
+            onClick={() => handleOpenStartModal(row.original)}
+            isDisabled={row.original.status === '运行中' || row.original.status === '启动中'}
+            mr={2}
           >
             启动
           </Button>
           <Button
-            danger
-            onClick={() => showKillModal(record)}
-            disabled={record.status !== '运行中'}
+            colorScheme="red"
+            size="sm"
+            onClick={() => handleOpenKillModal(row.original)}
+            isDisabled={row.original.status !== '运行中'}
           >
             终止
           </Button>
@@ -213,17 +319,91 @@ export default function Home() {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Snail Java 服务监控</h1>
-      <div style={{ marginBottom: '20px' }}>
-        <Button type="primary" onClick={startAllServices} style={{ marginRight: '10px' }}>
+    <Box p={5}>
+      <Heading mb={5}> Snail 服务管理 </Heading>
+      <Box mb={5}>
+        <Button colorScheme="blue" onClick={startAllServices} mr={3}>
           启动所有服务
         </Button>
-        <Button type="primary" danger onClick={stopAllServices}>
+        <Button colorScheme="red" onClick={stopAllServices}>
           停止所有服务
         </Button>
-      </div>
-      <Table dataSource={serviceList} columns={columns} rowKey="id" />
-    </div>
+      </Box>
+      <Table variant="simple" size="md" width="100%">
+        <Thead>
+          <Tr>
+            {columns.map((col) => (
+              <Th key={col.accessor}>{col.Header}</Th>
+            ))}
+          </Tr>
+        </Thead>
+        <Tbody>
+          {serviceList.map((service) => (
+            <Tr key={service.id}>
+              <Td>{service.id}</Td>
+              <Td>{service.name}</Td>
+              <Td>{service.pid || '-'}</Td>
+              <Td>
+                <Tag colorScheme={
+                  service.status === '运行中'
+                    ? 'green'
+                    : service.status === '启动中' || service.status === '端口未监听'
+                    ? 'blue'
+                    : 'red'
+                }>
+                  {service.status}
+                </Tag>
+              </Td>
+              <Td>
+                <Button
+                  colorScheme="blue"
+                  size="sm"
+                  onClick={() => handleOpenStartModal(service)}
+                  isDisabled={service.status === '运行中' || service.status === '启动中'}
+                  mr={2}
+                >
+                  启动
+                </Button>
+                <Button
+                  colorScheme="red"
+                  size="sm"
+                  onClick={() => handleOpenKillModal(service)}
+                  isDisabled={service.status !== '运行中'}
+                >
+                  终止
+                </Button>
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+
+      {/* 确认终止/启动服务的模态框 */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {currentService && currentService.status === '未启动' ? '启动服务' : '终止服务'}
+          </ModalHeader>
+          <ModalBody>
+            {currentService && (
+              <>
+                {currentService.status === '未启动'
+                  ? `确定要启动服务 "${currentService.name}" 吗？`
+                  : `确定要终止服务 "${currentService.name}" 吗？`}
+              </>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleConfirm}>
+              确定
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              取消
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </Box>
   );
 }
