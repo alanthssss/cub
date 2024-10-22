@@ -228,4 +228,19 @@ app.prepare().then(() => {
   server.all('*', (req, res) => {
     return handle(req, res);
   });
+
+  // API路由：获取所有服务信息
+  server.get('/api/get-services', (req, res) => {
+    const servicesInfo = services.map((service) => ({
+    id: service.id,
+    name: service.name,
+    command: service.command,
+    port: service.port,
+    healthUrl: service.healthUrl,
+    autoStart: service.autoStart,
+    startTrigger: service.startTrigger,
+    killTrigger: service.killTrigger,
+    }));
+    res.status(200).json({ services: servicesInfo });
+  });
 });
