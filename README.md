@@ -40,3 +40,28 @@ snail/
 - 用户界面：
   - 显示服务状态。
   - 提供启动和停止服务的操作。
+
+## services.yaml 说明
+
+说明：
+
+- autoStart：服务是否在服务器启动时自动启动。
+- startTrigger：启动触发方式，可以是 manual、scheduled 或 onBoot。
+- schedule：定时启动的Cron表达式。
+- killTrigger：终止触发方式，可以是 manual 或 scheduled。
+  
+```yaml
+services:
+  - id: 1
+    name: "Service 1"
+    command: "java -jar service1.jar"
+    port: 8001
+    healthUrl: "http://localhost:8001/health"
+    autoStart: true
+    startTrigger:
+      type: "onBoot" # "manual", "scheduled", "onBoot"
+      schedule: "0 9 * * *" # 每天上午9点启动
+    killTrigger:
+      type: "manual" # "manual", "scheduled"
+      schedule: "0 17 * * *" # 每天下午5点杀死
+```

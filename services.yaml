@@ -1,0 +1,25 @@
+# services.yaml
+services:
+  - id: 1
+    name: "Service 1"
+    command: "java -jar service1.jar"
+    port: 8001
+    healthUrl: "http://localhost:8001/health"
+    autoStart: true
+    startTrigger:
+      type: "onBoot" # "manual", "scheduled", "onBoot"
+      schedule: "0 9 * * *" # 每天上午9点启动
+    killTrigger:
+      type: "manual" # "manual", "scheduled"
+      schedule: "0 17 * * *" # 每天下午5点杀死
+  - id: 2
+    name: "Service 2"
+    command: "java -jar service2.jar"
+    port: 8002
+    healthUrl: "http://localhost:8002/health"
+    autoStart: false
+    startTrigger:
+      type: "manual"
+    killTrigger:
+      type: "manual"
+  # 继续添加到10个服务
