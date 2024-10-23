@@ -102,13 +102,24 @@ export default function Home() {
           isClosable: true,
         });
       }
-    } catch {
-      toast({
-        title: '网络错误',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: `详细信息: ${error.message}`,
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: '未知错误',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -135,13 +146,24 @@ export default function Home() {
           isClosable: true,
         });
       }
-    } catch {
-      toast({
-        title: '网络错误',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: `详细信息: ${error.message}`,
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: '未知错误',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -168,13 +190,24 @@ export default function Home() {
           isClosable: true,
         });
       }
-    } catch {
-      toast({
-        title: '网络错误',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: `详细信息: ${error.message}`,
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: '未知错误',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -199,13 +232,24 @@ export default function Home() {
           isClosable: true,
         });
       }
-    } catch {
-      toast({
-        title: '网络错误',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: `详细信息: ${error.message}`,
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: '未知错误',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -230,13 +274,24 @@ export default function Home() {
           isClosable: true,
         });
       }
-    } catch {
-      toast({
-        title: '网络错误',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: `详细信息: ${error.message}`,
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: '网络错误',
+          status: 'error',
+          description: '未知错误',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   };
 
